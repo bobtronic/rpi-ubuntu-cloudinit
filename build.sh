@@ -24,7 +24,7 @@ fi
 
 # unpack
 echo "* unpacking image"
-if [ -f "$IMAGE" ]; then
+if [ -f system-boot.img ]; then
     rm system-boot.img
 fi
 unxz --verbose --stdout $IMAGE > system-boot.img
@@ -41,13 +41,13 @@ mount -o loop /dev/mapper/$PARTITION ./system-boot
 
 
 # update the image files
-echo "* Applying cloud init"
+echo "* applying cloud init"
 # copy the cloud init config on
 cp --force ../cloud-init/* ./system-boot/
 
 
 # put a timestamp in
-echo "Built via https://github.com/bobtronic/rpi3-ubuntu-cloudinit" > ./system-boot/rpi3-ubuntu-cloudinit
+echo "Built via rpi3-ubuntu-cloudinit" > ./system-boot/rpi3-ubuntu-cloudinit
 date >> ./system-boot/rpi3-ubuntu-cloudinit
 echo && echo "######################################" 
 cat ./system-boot/rpi3-ubuntu-cloudinit
@@ -55,8 +55,8 @@ echo "######################################" && echo
 
 
 # cleanup time
-echo && echo && echo "* unmounting image"
+echo "* unmounting image"
 umount ./system-boot
 kpartx -d system-boot.img
-
+rmdir ./system-boot
 echo && echo "Done!"
