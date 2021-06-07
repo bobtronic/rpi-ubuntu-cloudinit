@@ -86,11 +86,14 @@ Once the cloud-init process is complete, you will see the raspberry pi device in
 
 ### Cloudinit
 https://cloudinit.readthedocs.io/en/latest/
+
 https://www.raspberrypi.org/forums/viewtopic.php?t=255465
+
 https://www.digitalocean.com/community/tutorials/how-to-use-cloud-config-for-your-initial-server-setup
 
 ### Networking
 https://linuxconfig.org/ubuntu-20-04-connect-to-wifi-from-command-line
+
 https://tailscale.com/kb/1039/install-ubuntu-2004
 
 ### Updating a disk image
