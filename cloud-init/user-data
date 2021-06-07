@@ -1,0 +1,166 @@
+#cloud-config
+
+# This is the user-data configuration file for cloud-init. By default this sets
+# up an initial user with password "password", which must be
+# changed at first login. However, many additional actions can be initiated on
+# first boot from this file. The cloud-init documentation has more details:
+#
+# https://cloudinit.readthedocs.io/
+#
+
+hostname: ${HOST}
+fqdn: ${FQDN}
+timezone: "${TIMEZONE}"
+
+# On first boot, set the (default) user's password and expire user passwords
+chpasswd:
+  expire: true
+  list:
+   - ${USERNAME}:${PASSWORD}
+
+# Enable password authentication with the SSH daemon
+ssh_pwauth: false
+
+## On first boot, use ssh-import-id to give the specific users SSH access to the default user
+#ssh_import_id:
+# - ${SSH_IMPORT_ID}
+
+## Add users and groups to the system, and import keys with ssh-import-id
+#groups:
+#- ubuntu: [${USERNAME}]
+
+users:
+ - default
+ - name: ${USERNAME}
+   sudo: ['ALL=(ALL) NOPASSWD:ALL']
+   ssh_import_id: ${SSH_IMPORT_ID}
+   plain_text_passwd: ${PASSWORD}
+   #gecos: ${USERNAME}
+   #primary_group: ${USERNAME}
+   #lock_passwd: false
+   shell: /bin/bash
+
+# Tailscale packages for ubuntu focal
+apt:
+  sources:
+    tailscale:
+      source: "deb [trusted=yes] https://pkgs.tailscale.com/stable/ubuntu focal main"
+## Key doesnt work at time of writing due to change from apt key stored in one file to stored as files in a directory
+## see https://github.com/canonical/cloud-init/blob/master/cloudinit/config/cc_apt_configure.py method add_apt_key_raw
+#      key: |
+#        -----BEGIN PGP PUBLIC KEY BLOCK-----
+#        mQINBF5UmbgBEADAA5mxC8EoWEf53RVdlhQJbNnQW7fctUA5yNcGUbGGGTk6XFqO
+#        nlek0Us0FAl5KVBgcS0Bj+VSwKVI/wx91tnAWI36CHeMyPTawdT4FTcS2jZMHbcN
+#        UMqM1mcGs3wEQmKz795lfy2cQdVktc886aAF8hy1GmZDSs2zcGMvq5KCNPuX3DD5
+#        INPumZqRTjwSwlGptUZrJpKWH4KvuGr5PSy/NzC8uSCuhLbFJc1Q6dQGKlQxwh+q
+#        AF4uQ1+bdy92GHiFsCMi7q43hiBg5J9r55M/skboXkNBlS6kFviP+PADHNZe5Vw0
+#        0ERtD/HzYb3cH5YneZuYXvnJq2/XjaN6OwkQXuqQpusB5fhIyLXE5ZqNlwBzX71S
+#        779tIyjShpPXf1HEVxNO8TdVncx/7Zx/FSdwUJm4PMYQmnwBIyKlYWlV2AGgfxFk
+#        mt2VexyS5s4YA1POuyiwW0iH1Ppp9X14KtOfNimBa0yEzgW3CHTEg55MNZup6k2Q
+#        mRGtRjeqM5cjrq/Ix15hISmgbZogPRkhz/tcalK38WWAR4h3N8eIoPasLr9i9OVe
+#        8aqsyXefCrziaiJczA0kCqhoryUUtceMgvaHl+lIPwyW0XWwj+0q45qzjLvKet+V
+#        Q8oKLT1nMr/whgeSJi99f/jE4sWIbHZ0wwR02ZCikKnS05arl3v+hiBKPQARAQAB
+#        tERUYWlsc2NhbGUgSW5jLiAoUGFja2FnZSByZXBvc2l0b3J5IHNpZ25pbmcga2V5
+#        KSA8aW5mb0B0YWlsc2NhbGUuY29tPokCTgQTAQgAOBYhBCWWqZ6qszghiTwKeUWM
+#        qDKVf1hoBQJeVJm4AhsDBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAAoJEEWMqDKV
+#        f1hoWHEP/1DYd9WZrodyV5zy1izvj0FXtUReJi374gDn3cHrG6uYtXcE9HWZhxQD
+#        6nDgYuey5sBhLvPQiE/sl5GYXNw/O95XVk8HS54BHCCYq1GeYkZaiCGLGFBA08JK
+#        7PZItGsfdJHwHfhSMtGPS7Cpmylje9gh8ic56NAhC7c5tGTlD69Y8zGHjnRQC6Hg
+#        wF34jdp8JTQpSctpmiOxOXN+eH8N59zb0k30CUym1Am438AR0PI6RBTnubBH+Xsc
+#        eQhLJnmJ1bM6GP4agXw5T1G/qp95gjIddHXzOkEvrpVfJFCtp91VIlBwycspKYVp
+#        1IKAdPM6CVf/YoDkawwm4y4OcmvNarA5dhWBG0Xqse4v1dlYbiHIFcDzXuMyrHYs
+#        D2Wg8Hx8TD64uBHY0fp24nweCLnaZCckVUsnYjb0A494lgwveswbZeZ6JC5SbDKH
+#        Tc2SE4jq+fsEEJsqsdHIC04d+pMXI95HinJHU1SLBTeKLvEF8Zuk7RTJyaUTjs7h
+#        Ne+xWDmRjjR/D/GXBxNrM9mEq6Jvp/ilYTdWwAyrSmTdotHb+NWjAGpJWj5AZCH9
+#        HeBr2mtVhvTu3KtCQmGpRiR18zMbmemRXUh+IX5hpWGzynhtnSt7vXOvhJdqqc1D
+#        VennRMQZMb09wJjPcvLIApUMl69r29XmyB59NM3UggK/UCJrpYfmuQINBF5UmbgB
+#        EADTSKKyeF3XWDxm3x67MOv1Zm3ocoe5xGDRApPkgqEMA+7/mjVlahNXqA8btmwM
+#        z1BH5+trjOUoohFqhr9FPPLuKaS/pE7BBP38KzeA4KcTiEq5FQ4JzZAIRGyhsAr+
+#        6bxcKV/tZirqOBQFC7bH2UAHH7uIKHDUbBIDFHjnmdIzJ5MBPMgqvSPZvcKWm40g
+#        W+LWMGoSMH1Uxd+BvW74509eezL8p3ts42txVNvWMSKDkpiCRMBhfcf5c+YFXWbu
+#        r5qus2mnVw0hIyYTUdRZIkOcYBalBjewVmGuSIISnUv76vHz133i0zh4JcXHUDqc
+#        yLBUgVWckqci32ahy3jc4MdilPeAnjJQcpJVBtMUNTZ4KM7UxLmOa5hYwvooliFJ
+#        wUFPB+1ZwN8d+Ly12gRKf8qA/iL8M5H4nQrML2dRJ8NKzP2U73Fw+n6S1ngrDX8k
+#        TPhQBq4EDjDyX7SW3Liemj5BCuWJAo53/2cL9P9I5Nu3i2pLJOHzjBSXxWaMMmti
+#        kopArlSMWMdsGgb0xYX+aSV7xW+tefYZJY1AFJ1x2ZgfIc+4zyuXnHYA2jVYLAfF
+#        pApqwwn8JaTJWNhny/OtAss7XV/WuTEOMWXaTO9nyNmHla9KjxlBkDJG9sCcgYMg
+#        aCAnoLRUABCWatxPly9ZlVbIPPzBAr8VN/TEUbceAH0nIwARAQABiQI2BBgBCAAg
+#        FiEEJZapnqqzOCGJPAp5RYyoMpV/WGgFAl5UmbgCGwwACgkQRYyoMpV/WGji9w/8
+#        Di9yLnnudvRnGLXGDDF2DbQUiwlNeJtHPHH4B9kKRKJDH1Rt5426Lw8vAumDpBlR
+#        EeuT6/YQU+LSapWoDzNcmDLzoFP7RSQaB9aL/nJXv+VjlsVH/crpSTTgGDs8qGsL
+#        O3Y2U1Gjo5uMBoOfXwS8o1VWO/5eUwS0KH7hpbOuZcf9U9l1VD2YpGfnMwX1rnre
+#        INJqseQAUL3oyNl76gRzyuyQ4AIA06r40hZDgybH0ADN1JtfVk8z4ofo/GcfoXqm
+#        hifWJa2SwwHeijhdN1T/kG0FZFHs1DBuBYJG3iJ3/bMeL15j1OjncIYIYccdoEUd
+#        uHnp4+ZYj5kND0DFziTvOC4WyPpv3BlBVariPzEnEqnhjx5RYwMabtTXoYJwUkxX
+#        2gAjKqh2tXissChdwDGRNASSDrChHLkQewx+SxT5kDaOhB84ZDnp+urn9A+clLkN
+#        lZMsMQUObaRW68uybSbZSmIWFVM1GovRMgrPG3T6PAykQhFyE/kMFrv5KpPh7jDj
+#        5JwzQkxLkFMcZDdS43VymKEggxqtM6scIRU55i059fLPAVXJG5in1WhMNsmt49lb
+#        KqB6je3plIWOLSPuCJ/kR9xdFp7Qk88GCXEd0+4z/vFn4hoOr85NXFtxhS8k9GfJ
+#        mM/ZfUq7YmHR+Rswe0zrrCwTDdePjGMo9cHpd39jCvc=
+#        =AIVM
+#        -----END PGP PUBLIC KEY BLOCK-----
+
+## Instead do a file copy :vomiting-face:
+write_files:
+- path: /etc/apt/trusted.gpg.d/tailscale.gpg
+  content: !!binary |
+    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
+    9cHpd39jCvc=
+#  owner: root:root
+#  permissions: '0755'
+## END Tailscale packages for ubuntu focal
+
+## Update apt database and upgrade packages on first boot
+package_update: true
+## Package upgrade takes ages on a pi :(
+#package_upgrade: true
+
+## Install additional packages on first boot
+packages:
+ - tailscale
+
+## Run arbitrary commands at rc.local like time
+runcmd:
+ ## Note that keys expire after 90 days and need to be regenerated.
+ ## https://login.tailscale.com/admin/settings/authkeys
+ - tailscale up --authkey ${TAILSCALE_TSKEY}
+

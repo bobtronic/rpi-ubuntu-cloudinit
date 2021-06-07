@@ -1,4 +1,3 @@
 *.img.xz
+*.img
 build/
-cloud-init/user-data
-cloud-init/network-config
