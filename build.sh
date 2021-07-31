@@ -137,15 +137,15 @@ echo "* mounting image"
 if [ -d /$OUTPUT.mount ]; then
     rm -fR /$OUTPUT.mount
 fi
-mkdir /$OUTPUT.mount
-PARTITION=$(kpartx -av $OUTPUT | grep -P '.*loop\d+p1\s' | awk '{print $3}')
-mount -o loop /dev/mapper/$PARTITION /$OUTPUT.mount
-
+mkdir $OUTPUT.mount
+PARTITION=$(kpartx -av "$OUTPUT" | grep -P '.*loop\d{1,2}+p1\s' | awk '{print $3}')
+echo "* Partition: " $PARTITION
+mount -o loop /dev/mapper/$PARTITION $OUTPUT.mount
 
 # update the image files
 echo "* applying cloud init to image"
 # copy the cloud init config on
-cp --force ../cloud-init/* /$OUTPUT.mount/
+cp --force ../cloud-init/* $OUTPUT.mount/
 # update the macros
 sed -i \
     -e "s|\${WIFI_SSID}|$WIFI_SSID|" \
@@ -171,9 +171,10 @@ echo "######################################" && echo
 
 # cleanup time
 echo "* unmounting image"
-umount /$OUTPUT.mount
+umount $OUTPUT.mount
 kpartx -d $OUTPUT
-rm -fR /$OUTPUT.mount/*
-rmdir /$OUTPUT.mount
+dmsetup remove_all
+rm -fR $OUTPUT.mount/*
+rmdir $OUTPUT.mount
 
 echo && echo $OUTDIR/$OUTPUT Done!
